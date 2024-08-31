@@ -18,6 +18,8 @@ jobs:
     steps:
     - name: checkout repo
       uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
     - name: Install the latest version of rye
       uses: eifinger/setup-rye@v4
     - name: bump version
