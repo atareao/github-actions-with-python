@@ -29,9 +29,17 @@ jobs:
       uses: eifinger/setup-rye@v4
     - name: bump version
       run: |
-        rye version -b ${{ github.event.inputs.version }} #the action is not update the code
+        option=${{ github.event.inputs.version }}
+        if [[ -z "$option" ]]; then
+          option=patch
+        fi
+        original_version=$(rye version)
+        rye version -b $option
+        new_version=$(rye version)
+        echo "original_version=${original_version}" >> $GITHUB_ENV
+        echo "new_version=${new_version}" >> $GITHUB_ENV
     - name: commit
       uses: stefanzweifel/git-auto-commit-action@v5
       with:
-        commit_message: "Bump version to ${{ github.event.inputs.version }}"
+        commit_message: "Bump version from ${{ env.original_version }} to ${{ env.new_version }}"
 
