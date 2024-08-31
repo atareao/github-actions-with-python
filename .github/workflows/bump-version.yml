@@ -17,12 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: checkout repo
-      uses: actions/checkout@v2.4.0
-    - name: setup python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.x'
-        architecture: 'x64'
+      uses: actions/checkout@v4
     - name: Install the latest version of rye
       uses: eifinger/setup-rye@v4
     - name: Setup Git
