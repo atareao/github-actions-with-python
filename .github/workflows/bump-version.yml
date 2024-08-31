@@ -15,21 +15,18 @@ on:
 jobs:
   bump-version:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
     - name: checkout repo
       uses: actions/checkout@v4
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
     - name: Install the latest version of rye
       uses: eifinger/setup-rye@v4
     - name: bump version
       run: |
         rye version -b ${{ github.event.inputs.version }} #the action is not update the code
     - name: commit
-      uses: EndBug/add-and-commit@v9
+      uses: stefanzweifel/git-auto-commit-action@v5
       with:
-        message: "Bump version to ${{ github.event.inputs.version }}"
-        add: 'pyproject.toml'
-        author_name: "${GITHUB_ACTOR}"
-        author_email: "${GITHUB_ACTOR}@atareao.es"
+        commit_message: "Bump version to ${{ github.event.inputs.version }}"
 
