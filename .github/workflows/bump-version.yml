@@ -20,14 +20,17 @@ jobs:
       uses: actions/checkout@v4
     - name: Install the latest version of rye
       uses: eifinger/setup-rye@v4
-    - name: Setup Git
-      run: |
-        git config user.name "${GITHUB_ACTOR}"
-        git config user.email "${GITHUB_ACTOR}@atareao.es"
     - name: bump version
       run: |
         rye version -b ${{ github.event.inputs.version }} #the action is not update the code
         git add pyproject.toml
         git commit -m "Bump version to ${{ github.event.inputs.version }}"
         git push
+    - name: commit
+      uses: EndBug/add-and-commit@v9
+      with:
+        message: "Bump version to ${{ github.event.inputs.version }}"
+        add: 'pyproject.toml'
+        author_name: "${GITHUB_ACTOR}"
+        author_email: "${GITHUB_ACTOR}@atareao.es"
 
