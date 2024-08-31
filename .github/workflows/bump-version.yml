@@ -45,14 +45,19 @@ jobs:
     - name: checkout repo
       uses: actions/checkout@v4
       with:
-        ref: development
+        ref: main
+    - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+    - name: get release version
+      run: |
+        release_version=$(rye version)
+        echo "release_version=${release_version}" >> $GITHUB_ENV
     - name: Release snapshot
       id: release-snapshot
       uses: actions/create-release@latest
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: "v${{ env.new_version }}"
+        tag_name: "v${{ env.release_version }}"
         release_name: "v${{ env.new_version }}"
         draft: false
         prerelease: false
