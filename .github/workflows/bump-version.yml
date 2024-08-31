@@ -42,4 +42,5 @@ jobs:
       uses: stefanzweifel/git-auto-commit-action@v5
       with:
         commit_message: "Bump version from ${{ env.original_version }} to ${{ env.new_version }}"
+        tagging_message: "v${{ env.new_version }}"
 
