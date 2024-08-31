@@ -1,6 +1,9 @@
 name: Bump version workflow
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       version:
@@ -20,6 +23,8 @@ jobs:
     steps:
     - name: checkout repo
       uses: actions/checkout@v4
+      with:
+        ref: development
     - name: Install the latest version of rye
       uses: eifinger/setup-rye@v4
     - name: bump version
