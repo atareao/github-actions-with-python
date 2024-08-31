@@ -23,9 +23,6 @@ jobs:
     - name: bump version
       run: |
         rye version -b ${{ github.event.inputs.version }} #the action is not update the code
-        git add pyproject.toml
-        git commit -m "Bump version to ${{ github.event.inputs.version }}"
-        git push
     - name: commit
       uses: EndBug/add-and-commit@v9
       with:
