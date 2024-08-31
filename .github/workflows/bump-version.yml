@@ -1,28 +1,41 @@
 name: Bump version workflow
 
-on:
-  push:
-    branches:
-    - main
+on:   workflow_dispatch:
+    inputs:
+      version:     
+        description: 'Semver type of new version (major / minor / patch)'
+        required: true
+        type: choice
+        options: 
+        - patch
+        - minor
+        - major
 
-jobs:
-  bump-version:
-    name: Bump package version
-    if: "!contains(github.event.head_commit.message, 'Bump version')"
-    runs-on: ubuntu-20.04
+jobs:   bump-version:
+    runs-on: ubuntu-latest
     steps:
-    - name: actions/checkout
-      uses: actions/checkout@v2
+
+    - name: checkout repo
+      uses: actions/checkout@v2.4.0
+
+    - name: setup python
+      uses: actions/setup-python@v2
       with:
-          persist-credentials: false
-    - name: current_version
-      run: echo "current_version=$(grep '# version' version.md | cut -d ' ' -f3)" >> $GITHUB_ENV
-    - name: FragileTech/bump-version
-      uses: FragileTech/bump-version@main
-      with:
-        current_version: "${{ env.current_version }}"
-        files: version.md
-        commit_name: Your Company Bot
-        commit_email: bot@your-company.com
-        login: your-bot-login
-        token: "${{ secrets.BOT_TOKEN }}"
+        python-version: '3.x'
+        architecture: 'x64'
+
+    - name: Install the latest version of rye
+      uses: eifinger/setup-rye@v4
+  
+    - name: Setup Git
+      run: |
+        git config user.name "${GITHUB_ACTOR}"
+        git config user.email "${GITHUB_ACTOR}@atareao.es"
+
+    - name: bump version
+      run: |
+        rye version -b ${{ github.event.inputs.version }} #the action is not update the code
+        git add pyproject.toml
+        git commit -m "Bump version to ${{ github.event.inputs.version }}"
+        git push
+
