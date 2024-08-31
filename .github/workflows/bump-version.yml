@@ -51,6 +51,7 @@ jobs:
       run: |
         release_version=$(rye version)
         echo "release_version=${release_version}" >> $GITHUB_ENV
+        echo "Release version is ${{ env.release_version }}"
     - name: Release snapshot
       id: release-snapshot
       uses: actions/create-release@latest
