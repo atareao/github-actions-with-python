@@ -70,6 +70,9 @@ jobs:
       if: ${{ steps.get_action.outputs.action != 'none' }}
       run: |
         current_version=${{ steps.get_current_version.outputs.current_version }}
+        github_actor=${{ github.actor }}
+        git config user.name "${github_actor}"
+        git config user.email "${github_actor}@users.noreply.github.com"
         git tag -a "${current_version}" -m "Bump version to ${current_version}" -s
         git push origin "${current_version}"
         gh release create "${current_version}" --title "${current_version}" --notes "Bump version to ${current_version}"
