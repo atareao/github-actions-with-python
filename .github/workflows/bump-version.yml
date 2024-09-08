@@ -3,17 +3,7 @@ name: Bump version workflow
 on:
   push:
     branches:
-      - main
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'Semver type of new version (major / minor / patch)'
-        required: true
-        type: choice
-        options: 
-        - patch
-        - minor
-        - major
+      - development
 
 jobs:
   bump-version:
@@ -25,6 +15,11 @@ jobs:
       uses: actions/checkout@v4
       with:
         ref: development
+    - name: Get comments
+      run: |
+        comments=$(git log --pretty=format:"%s" -1)
+        echo $comments
+        echo "comments=${comments}" >> $GITHUB_OUTPUT
     - name: Install the latest version of rye
       uses: eifinger/setup-rye@v4
     - name: bump version
