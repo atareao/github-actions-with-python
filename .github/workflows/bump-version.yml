@@ -31,7 +31,9 @@ jobs:
           action="none"
         fi
         echo "action=${action}" >> $GITHUB_OUTPUT
+        echo "Selected action: ${action}"
     - name: Install the latest version of rye
+      id: install_rye
       if: ${{ steps.get_action.outputs.action != 'none' }}
       uses: eifinger/setup-rye@v4
     - name: Get current version
