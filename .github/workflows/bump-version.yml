@@ -74,6 +74,6 @@ jobs:
         github_actor=${{ github.actor }}
         git config user.name "${github_actor}"
         git config user.email "${github_actor}@users.noreply.github.com"
-        git tag -a "${current_version}" -m "Bump version to ${current_version}" -s
+        git tag -a "${current_version}" -m "Bump version to ${current_version}"
         git push origin "${current_version}"
         gh release create "${current_version}" --title "${current_version}" --notes "Bump version to ${current_version}"
