@@ -3,20 +3,10 @@ name: Bump version workflow
 on:
   push:
     branches:
-      - main
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'Semver type of new version (major / minor / patch)'
-        required: true
-        type: choice
-        options: 
-        - patch
-        - minor
-        - major
+      - development
 
 jobs:
-  bump-version:
+  bump_version:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -25,41 +15,50 @@ jobs:
       uses: actions/checkout@v4
       with:
         ref: development
-    - name: Install the latest version of rye
-      uses: eifinger/setup-rye@v4
-    - name: bump version
+    - name: Get action from comments
+      id: get_action
       run: |
-        option=${{ github.event.inputs.version }}
-        if [[ -z "$option" ]]; then
-          option=patch
+        comments=$(git log --pretty=format:"%s" -1)
+        echo "Comments: ${comments}"
+        if [[ "$comments" =~ \#major ]]; then
+          action="major"
+        elif [[ "$comments" =~ \#minor ]]; then
+          action="minor"
+        elif [[ "$comments" =~ \#patch ]]; then
+          action="patch"
+        else
+          action="none"
         fi
-        original_version=$(rye version)
+        echo "action=${action}" >> $GITHUB_OUTPUT
+        echo "Selected action: ${action}"
+    - name: Install the latest version of rye
+      id: install_rye
+      if: ${{ steps.get_action.outputs.action != 'none' }}
+      uses: eifinger/setup-rye@v4
+    - name: Get current version
+      id: get_current_version
+      if: ${{ steps.get_action.outputs.action != 'none' }}
+      run: |
+        current_version=$(rye version)
+        echo "current_version=${current_version}" >> $GITHUB_OUTPUT
+    - name: Merge development into main
+      if: ${{ steps.get_action.outputs.action != 'none' }}
+      uses: devmasx/merge-branch@master
+      with:
+        type: now
+        from_branch: development
+        target_branch: main
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+    - name: bump version
+      id: bump_version
+      if: ${{ steps.get_action.outputs.action != 'none' }}
+      run: |
+        action=${{ github.get_action.outputs.action }}
         rye version -b $option
         new_version=$(rye version)
-        echo "original_version=${original_version}" >> $GITHUB_ENV
-        echo "new_version=${new_version}" >> $GITHUB_ENV
+        echo "new_version=${new_version}" >> $GITHUB_OUTPUT
     - name: commit
       uses: stefanzweifel/git-auto-commit-action@v5
       with:
-        commit_message: "Bump version from ${{ env.original_version }} to ${{ env.new_version }}"
-    - name: checkout repo
-      uses: actions/checkout@v4
-      with:
-        ref: main
-    - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
-    - name: get release version
-      run: |
-        release_version=$(rye version)
-        echo "release_version=${release_version}" >> $GITHUB_ENV
-        echo "Release version is ${{ env.release_version }}"
-    - name: Release snapshot
-      id: release-snapshot
-      uses: actions/create-release@latest
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: "v${{ env.release_version }}"
-        release_name: "v${{ env.release_version }}"
-        draft: false
-        prerelease: false
+        commit_message: "Bump version from ${{ steps.get_current_version.outputs.current_version}} to ${{ steps.bump_version.outputs.new_version }}"
 
