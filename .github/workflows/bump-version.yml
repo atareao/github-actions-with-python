@@ -54,7 +54,7 @@ jobs:
       if: ${{ steps.get_action.outputs.action != 'none' }}
       run: |
         action=${{ steps.get_action.outputs.action }}
-        rye version -b $option
+        rye version -b $action
         new_version=$(rye version)
         echo "new_version=${new_version}" >> $GITHUB_OUTPUT
     - name: commit
