@@ -80,3 +80,13 @@ jobs:
         git tag -a "v${current_version}" -m "Bump version to ${current_version}"
         git push origin "v${current_version}"
         gh release create "v${current_version}" --title "v${current_version}" --notes "Bump version to ${current_version}"
+    - name: exit code
+      id: exit_code
+      run: |
+        action=${{ steps.get_action.outputs.action }}
+        if [[ "$action" == "none" ]]; then
+          echo "Not created new release"
+          exit 1
+        fi
+        echo "Created new release"
+        exit 0
