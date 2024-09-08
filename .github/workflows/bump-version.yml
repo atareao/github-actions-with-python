@@ -62,4 +62,14 @@ jobs:
       if: ${{ steps.get_action.outputs.action != 'none' }}
       with:
         commit_message: "Bump version from ${{ steps.get_current_version.outputs.current_version}} to ${{ steps.bump_version.outputs.new_version }}"
-
+    - name: checkout main
+      uses: actions/checkout@v4
+      with:
+        ref: main
+    - name: create tag
+      if: ${{ steps.get_action.outputs.action != 'none' }}
+      run: |
+        current_version=${{ steps.get_current_version.outputs.current_version }}
+        git tag -a "${current_version}" -m "Bump version to ${current_version}" -s
+        git push origin "${current_version}"
+        gh release create "${current_version}" --title "${current_version}" --notes "Bump version to ${current_version}"
