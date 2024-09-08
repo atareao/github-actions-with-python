@@ -67,6 +67,7 @@ jobs:
       with:
         ref: main
     - name: create tag
+      id: create_tag
       if: ${{ steps.get_action.outputs.action != 'none' }}
       run: |
         current_version=${{ steps.get_current_version.outputs.current_version }}
