@@ -19,13 +19,12 @@ jobs:
       id: get_action
       run: |
         comments=$(git log --pretty=format:"%s" -1)
-        echo $comments
-        echo "comments=${comments}" >> $GITHUB_OUTPUT
-        if [[ $comments =~ "\#major" ]]; then
+        echo "Comments: ${comments}"
+        if [[ "$comments" =~ \#major ]]; then
           action="major"
-        elif [[ $comments =~ "\#minor" ]]; then
+        elif [[ "$comments" =~ \#minor ]]; then
           action="minor"
-        elif [[ $comments =~ "\#patch" ]]; then
+        elif [[ "$comments" =~ \#patch ]]; then
           action="patch"
         else
           action="none"
