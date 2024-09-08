@@ -43,14 +43,12 @@ jobs:
         echo "current_version=${current_version}" >> $GITHUB_OUTPUT
     - name: Merge development into main
       if: ${{ steps.get_action.outputs.action != 'none' }}
-      run: |
-        current_version=${{ steps.get_action.outputs.current_version }}
-        git checkout main
-        git pull origin main
-        git merge --no-edit --no-ff development
-        git push origin main
-        git tag -a "$current_version" -m "Release ${current_version}" -s
-        gh create release "${current_version}" --title "Release ${current_version}" --notes "Release ${current_version}"
+      uses: devmasx/merge-branch@master
+      with:
+        type: now
+        from_branch: development
+        target_branch: main
+        github_token: ${{ secrets.GITHUB_TOKEN }}
     - name: bump version
       id: bump_version
       if: ${{ steps.get_action.outputs.action != 'none' }}
